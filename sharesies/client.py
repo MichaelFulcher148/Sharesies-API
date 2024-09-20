@@ -213,9 +213,9 @@ class Client:
             'https://data.sharesies.nz/api/v1/instruments?Page='+str(page)+'&PerPage=500&Sort=marketCap&PriceChangeTime=1y&Query='
         )
 
-        filtered_data = [item for item in r.json()["instruments"] if item["instrumentType"] == "equity"]
+        companies = [item for item in r.json()["instruments"] if item["instrumentType"] == "equity"]
 
-        return filtered_data
+        return companies
 
     def get_info(self):
         '''
