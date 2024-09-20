@@ -289,14 +289,6 @@ class Client:
     def auto_invest_create(self, amount, interval, start, companies, percentages, order_name):
         '''
         Create an auto invest order
-        
-        func params:
-            amount: amount in NZ dollars
-            interval: auto invest interval ("1week", "2week", "4week", "1month")
-            start: date of start ("YYYY-MM-DD")
-            companies: array of companies to auto invest in
-            percentages: array of percentages corresponding with the company in the same array index
-            order_name: name of the order
         '''
         
         self.reauth() # Avoid timeout
@@ -321,16 +313,7 @@ class Client:
     
     def auto_invest_update(self, order_id, amount, interval, start, companies, percentages, order_name):
         '''
-        Create an auto invest order
-        
-        func params:
-            id: existing auto invest id
-            amount: amount in NZ dollars
-            interval: auto invest interval ("1week", "2week", "4week", "1month")
-            start: date of start ("YYYY-MM-DD")
-            companies: array of companies to auto invest in
-            percentages: array of percentages corresponding with the company in the same array index
-            order_name: name of the order
+        Update an existing auto invest order
         '''
         
         self.reauth() # Avoid timeout
