@@ -313,7 +313,7 @@ class Client:
         }
         
         r = self.session.post(
-            'https://app.sharesies.com/api/autoinvest/set-diy-order',
+            'https://app.sharesies.nz/api/autoinvest/set-diy-order',
             json=auto_invest_info
         )
         
