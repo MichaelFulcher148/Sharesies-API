@@ -285,6 +285,39 @@ class Client:
         )
 
         return r.status_code == 200
+    
+    def auto_invest_create(self, amount, interval, start, companies, percentages, order_name):
+        '''
+        Create an auto invest order
+        
+        func params:
+            amount: amount in NZ dollars
+            interval: auto invest interval ("1week", "2week", "4week", "1month")
+            start: date of start ("YYYY-MM-DD")
+            companies: array of companies to auto invest in
+            percentages: array of percentages corresponding with the company in the same array index
+            order_name: name of the order
+        '''
+        
+        self.reauth() # Avoid timeout
+        
+        allocations = [{"fund_id": company['id'], "allocation": str(percentage)} for company, percentage in zip(companies, percentages)]
+        
+        auto_invest_info = {
+            'acting_as_id': self.user_id,
+            'amount': amount,
+            'interval': interval,
+            'start': start,
+            'allocations': allocations,
+            'order_name': order_name,   
+        }
+        
+        r = self.session.post(
+            'https://app.sharesies.com/api/autoinvest/set-diy-order',
+            json=auto_invest_info
+        )
+        
+        return r.status_code == 200
 
     def sell(self, company, shares):
         '''
