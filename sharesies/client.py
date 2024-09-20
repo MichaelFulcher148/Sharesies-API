@@ -201,18 +201,21 @@ class Client:
 
         return r.json()['dayPrices']
 
-    def get_companies(self):
+    def get_companies(self, page=1):
         '''
-        Returns all companies accessible through Sharesies
+        Gets a certain page of companies
         '''
+
+        headers = self.session.headers
+        headers['Authorization'] = f'Bearer {self.auth_token}'
 
         r = self.session.get(
-            'https://app.sharesies.nz/api/fund/list'
+            'https://data.sharesies.nz/api/v1/instruments?Page='+str(page)+'&PerPage=500&Sort=marketCap&PriceChangeTime=1y&Query='
         )
 
-        funds = r.json()['funds']
+        filtered_data = [item for item in r.json()["instruments"] if item["instrumentType"] == "equity"]
 
-        return [fund for fund in funds if fund['fund_type'] == 'company']
+        return filtered_data
 
     def get_info(self):
         '''
