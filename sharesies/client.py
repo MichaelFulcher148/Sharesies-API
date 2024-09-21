@@ -288,6 +288,57 @@ class Client:
         )
 
         return r.status_code == 200
+    
+    def auto_invest_create(self, amount, interval, start, companies, percentages, order_name):
+        '''
+        Create an auto invest order
+        '''
+        
+        self.reauth() # Avoid timeout
+        
+        allocations = [{"fund_id": company['id'], "allocation": str(percentage)} for company, percentage in zip(companies, percentages)]
+        
+        auto_invest_info = {
+            'acting_as_id': self.user_id,
+            'amount': amount,
+            'interval': interval,
+            'start': start,
+            'allocations': allocations,
+            'order_name': order_name,   
+        }
+        
+        r = self.session.post(
+            'https://app.sharesies.nz/api/autoinvest/set-diy-order',
+            json=auto_invest_info
+        )
+        
+        return r.status_code == 200
+    
+    def auto_invest_update(self, order_id, amount, interval, start, companies, percentages, order_name):
+        '''
+        Update an existing auto invest order
+        '''
+        
+        self.reauth() # Avoid timeout
+        
+        allocations = [{"fund_id": company['id'], "allocation": str(percentage)} for company, percentage in zip(companies, percentages)]
+        
+        auto_invest_info = {
+            'acting_as_id': self.user_id,
+            'amount': amount,
+            'interval': interval,
+            'order_id': order_id,
+            'start': start,
+            'allocations': allocations,
+            'order_name': order_name,   
+        }
+        
+        r = self.session.post(
+            'https://app.sharesies.nz/api/autoinvest/set-diy-order',
+            json=auto_invest_info
+        )
+        
+        return r.status_code == 200
 
     def sell(self, company, shares):
         '''
