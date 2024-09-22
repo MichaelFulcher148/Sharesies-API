@@ -230,7 +230,7 @@ class Client:
 
     def get_profile(self):
         '''
-        Returns the logged in users profile
+        Returns the logged in user's profile
         '''
 
         r = self.session.get(
@@ -238,6 +238,20 @@ class Client:
         )
 
         return r.json()
+    
+    def get_wallet_balance(self):
+        '''
+        Returns the logged in user's wallet balance
+        '''
+
+        r = self.session.get(
+            'https://app.sharesies.nz/api/identity/check'
+        )
+
+        response = r.json()
+        wallet = response['user']['wallet_balances']
+
+        return wallet
 
     def get_portfolio(self, portfolio_id):
         '''
