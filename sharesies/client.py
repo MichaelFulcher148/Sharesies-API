@@ -80,9 +80,9 @@ class Client:
             r = self.session.get(
                 "https://app.sharesies.nz/api/accounting/transaction-history",
                 params=params, cookies=cookies)
-            responce = r.json()
-            transactions.extend(responce['transactions'])
-            has_more = responce['has_more']
+            response = r.json()
+            transactions.extend(response['transactions'])
+            has_more = response['has_more']
             params['before'] = transactions[-1]['transaction_id']
 
         return transactions
@@ -141,16 +141,16 @@ class Client:
 
         r = self.session.get("https://data.sharesies.nz/api/v1/instruments",
                              params=params, headers=headers)
-        responce = r.json()
+        response = r.json()
 
         # get dividends and price history
-        for i in range(len(responce['instruments'])):
-            current = responce['instruments'][i]
+        for i in range(len(response['instruments'])):
+            current = response['instruments'][i]
             id_ = current['id']
             # current['dividends'] = self.get_dividends(id_)
             current['priceHistory'] = self.get_price_history(id_)
 
-        return responce
+        return response
 
     def get_instrument(self, fund_id):
         '''
