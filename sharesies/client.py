@@ -272,7 +272,7 @@ class Client:
 
         exchange_rate = None
 
-        # Loop through the list of currency pairs
+        # Loop through the response of currency pairs and find the correct one based on params
         for currency in rate_data['fx_currencies']:
             if (currency['source_currency'] == source_currency and 
                     currency['target_currency'] == target_currency):
@@ -282,9 +282,15 @@ class Client:
         if exchange_rate is None:
             raise ValueError(f"No exchange rate found for {source_currency} to {target_currency}")
         
+        # calculate fee
         source_fee = source_amount * 0.004975
+
+        # calculate target amount and round as sharesies api expects
         target_amount = (source_amount - source_fee) * exchange_rate
         target_amount = math.floor(target_amount * 100) / 100
+
+        if target_amount < 0.01:
+            raise ValueError("Your source currency amount does not equal at least 0.01 of the target currency")
 
         transfer_info = {
             'acting_as_id': self.user_id,
