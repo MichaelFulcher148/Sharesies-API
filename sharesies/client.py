@@ -151,6 +151,28 @@ class Client:
             current['priceHistory'] = self.get_price_history(id_)
 
         return responce
+    
+    def get_weekly_top_ten(self, index=None):
+        '''
+        Get the weekly top ten funds.
+        If index is None, returns all fund IDs.
+        Otherwise, returns the fund ID at the specified index.
+        '''
+
+        if index is not None and (index < 0 or index >= 10):
+            raise IndexError("Index out of range. Please provide an index between 0 and 10")
+
+        r = self.session.get(
+            'https://app.sharesies.nz/api/explore/weekly-top-ten-funds',
+        )
+        
+        response = r.json()
+        fund_ids = response['fund_ids']
+
+        if index is not None:
+            return fund_ids[index]
+
+        return fund_ids  # Return all fund IDs if index is None
 
     def get_instrument(self, fund_id):
         '''
