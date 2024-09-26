@@ -1,6 +1,7 @@
 import requests
 from sharesies.util import PropagatingThread
 from queue import Queue
+import math
 
 
 class Client:
@@ -252,11 +253,81 @@ class Client:
 
     def get_profile(self):
         '''
-        Returns the logged in users profile
+        Returns the logged in user's profile
         '''
 
         r = self.session.get(
             'https://app.sharesies.nz/api/identity/check'
+        )
+
+        return r.json()
+    
+    def get_wallet_balance(self):
+        '''
+        Returns the logged in user's wallet balance
+        '''
+
+        r = self.session.get(
+            'https://app.sharesies.nz/api/identity/check'
+        )
+
+        response = r.json()
+        wallet = response['user']['wallet_balances']
+
+        return wallet
+    
+    def transfer_funds(self, source_currency, target_currency, source_amount):
+        '''
+        Transfers currency between the currencies specified
+        '''
+
+        self.reauth()  # Avoid timeout
+
+        headers = self.session.headers
+        headers['Authorization'] = f'Bearer {self.auth_token}'
+
+        exchange_r = self.session.get(
+            f'https://app.sharesies.nz/api/fx/get-rate-v2?acting_as_id={self.user_id}'
+        )
+
+        rate_data = exchange_r.json()
+
+        exchange_rate = None
+
+        # Loop through the response of currency pairs and find the correct one based on params
+        for currency in rate_data['fx_currencies']:
+            if (currency['source_currency'] == source_currency and 
+                    currency['target_currency'] == target_currency):
+                exchange_rate = float(currency['rate'])
+                break
+
+        if exchange_rate is None:
+            raise ValueError(f"No exchange rate found for {source_currency} to {target_currency}")
+        
+        # calculate fee
+        source_fee = source_amount * 0.004975
+
+        # calculate target amount and round as sharesies api expects
+        target_amount = (source_amount - source_fee) * exchange_rate
+        target_amount = math.floor(target_amount * 100) / 100
+
+        if target_amount < 0.01:
+            raise ValueError("Your source currency amount does not equal at least 0.01 of the target currency")
+
+        transfer_info = {
+            'acting_as_id': self.user_id,
+            'source_currency': source_currency,
+            'target_currency': target_currency,
+            'quoted_rate': exchange_rate,
+            'source_amount': source_amount,
+            'target_amount': target_amount,
+            'source_fee': source_fee,
+            'buy_or_sell': 'sell'
+        }
+
+        r = self.session.post(
+            f'https://app.sharesies.nz/api/fx/create-order',
+            json=transfer_info
         )
 
         return r.json()
